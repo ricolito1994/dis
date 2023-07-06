@@ -23,7 +23,7 @@ export class Modal extends Controller{
 				this.modalID = this.modalData.params.instanceID ? this.modalData.params.instanceID : this.modalData.modalID;
 				this.controllerName = this.modalData.params.instanceID ? this.modalData.params.instanceID : this.modalData.controllerName;
 			}
-			//console.log(this.controllerName,'#'+this.modalID);
+			
 			
 			this.binds(this.controllerName,'#'+this.modalID);
 			/* automatically populate schoolyear options */
