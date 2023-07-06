@@ -792,7 +792,7 @@ export class MainService {
 		return ( (  currentDate[0] - birthDate[0] ) - 1  );
 	}
 	
-	calculateDaysPassed ( fromDate , toDate ){
+	calculateDaysPassed ( fromDate , toDate , daysOnly ){
 		let from = new Date(fromDate);
 		let to = new Date(toDate);
 		
@@ -804,17 +804,29 @@ export class MainService {
 		
 		let diffmonths = parseFloat(Difference_In_Days/31).toFixed(0);
 		let diffyears = parseFloat(Difference_In_Days/365).toFixed(0);
-		console.log(diffyears,diffmonths)
 		
-		if (diffmonths > 0 & diffyears <= 0){
-			return `${diffmonths} months ago`;
+		if (!daysOnly) {
+			if (diffmonths > 0 & diffyears <= 0){
+				//return `${diffmonths} months ago`;
+				return {
+					value : diffmonths,
+					type : 'month'
+				}
+			}
+			
+			else if (diffyears > 0){
+				//return `${diffyears} years ago`;
+				return {
+					value : diffyears,
+					type : 'year'
+				}
+			}
 		}
-		
-		else if (diffyears > 0){
-			return `${diffyears} years ago`;
+		//return `${Difference_In_Days} days ago`;
+		return {
+			value : Difference_In_Days,
+			type : 'day',
 		}
-		
-		return `${Difference_In_Days} days ago`;
 	}
 	
 	generate_id_timestamp( keyword ) {

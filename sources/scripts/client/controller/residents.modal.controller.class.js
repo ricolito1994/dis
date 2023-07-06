@@ -19,13 +19,21 @@ export class ResidentsModalController extends Modal {
 			MIDDLENAME : "",
 			IS_FAMILY_LEADER : 0,
 			HAS_SCHOLARSHIP : 0,
-			ADDRESS : `${session_data.BARANGAY_NAME} ${session_data.CITY_M} ${session_data.PROVINCE}`,
+			ADDRESS : `${session_data.CITY_M} ${session_data.PROVINCE}`,
 			BIRTHDAY : this.tenYearsAgo,
 			//AGE : 0,
 			PUROK : "",
 			RESIDENT_ID : this.mainService.makeid(15),
 			FULLNAME : "",
 			HH_LEADER : "",
+			BLOOD_TYPE : "O+",
+			COMORDIBITY : [],
+			VACCINATION : [],
+			EMERGENCY : {
+				NAME: '',
+				CONTACT_NUMBER : '',
+				ADDRESS : '',
+			},
 		}
 
 		this.PUROK_NAME = this.modalData.args['PUROK_NAME'] ? this.modalData.args['PUROK_NAME'] : "" ;
@@ -37,9 +45,20 @@ export class ResidentsModalController extends Modal {
 		for (let md in this.residentVars){
 			let sel = this.modalData.args[md];
 			if (sel){
-				this.residentVars[md] = sel;
+				try {
+					sel =  JSON.parse(sel);
+				} catch (e) {
+				}
+				finally {
+					this.residentVars[md] = sel;
+				}
 			}
 		}
+		
+		if (this.modalData.args['ID']) {
+			this.residentVars['ID'] = this.modalData.args['ID'];
+		}
+		//console.log('this.residentVars', this.residentVars);
 		
 		if ( this.modalData.brgyargs ){
 			this.residentVars.HH_LEADER =  this.modalData.brgyargs.HH_LEADER;
@@ -61,6 +80,30 @@ export class ResidentsModalController extends Modal {
 			this.houseHoldMembers =  this.modalData.args['hh_members'];
 		}
 		
+		this.comordibities = [
+			'',
+			'Cancer',
+			'Diabetes',
+			'Asthma',
+			'Arthritis',
+			'COPD',
+			'Kidney Disease',
+			'Mental Health Issues',
+			'Hypertension',
+			'Obesity',
+			'Sensory impairment',
+			'Joint disease',
+		];
+
+		this.vaccines = [
+			'',
+			'ASTRAZENECA',
+			'PHIZER BIONTECH',
+			'SINOVAC',
+			'SPUTNIC V',
+			'JHONSON AND JHONSON`S',
+			'MODERNA VACCINE',
+		];
 		//console.log(this.houseHoldMembers );
 		
 		this.calcAge({load:true});
@@ -89,9 +132,10 @@ export class ResidentsModalController extends Modal {
 
 		var qrcode = new QRCode(qrid);
 		qrcode.makeCode(this.residentVars.RESIDENT_ID);
-		
-		if(!this.modalData.instanceID)
-			this.addMembers();
+		this.setComordibity();
+		this.setVaccine();
+		//if(!this.modalData.instanceID)
+		//	this.addMembers();
 	}
 	
 	changefamilyleaderstat(){
@@ -124,6 +168,130 @@ export class ResidentsModalController extends Modal {
 		this.residentVars.IS_FAMILY_LEADER = 0;
 		alert ("Cannot set as family leader!");
 		this.bindChildObject(this,false);
+	}
+
+	addComordibity () {
+		this.residentVars.COMORDIBITY.push('');
+		this.setComordibity();
+	}
+
+	removeComordibity (params) {
+		this.residentVars.COMORDIBITY.splice(params.index, 1);
+		this.setComordibity();
+	}
+
+	setComordibity ( ) {
+		let table = document.querySelector('#comordibity-table');
+		table.innerHTML = "";
+		for (let j in this.residentVars.COMORDIBITY) {
+			
+			let select = document.createElement('select');
+			select.dataset.valuectrl = `residentVars.COMORDIBITY.${j}`;
+			select.dataset.event = `${this.controllerName}.change.changeComordibity`;
+			select.className = 'form-control';
+
+			for (let i in this.comordibities) {
+				let sel = this.comordibities[i];
+				let option = document.createElement('option');
+				option.dataset.params = `{'index':${i}}`;
+				option.innerHTML = sel;
+				select.appendChild(option);
+			}
+			let tr = document.createElement('tr');
+			let td1 = document.createElement('td');
+			let td2 = document.createElement('td');
+			let removeButton = document.createElement('button');
+				removeButton.classList='btn btn-danger';
+				removeButton.innerText = 'x';
+				removeButton.dataset.params = '{"index":"'+j+'"}' ;
+				removeButton.dataset.event = `${this.controllerName}.click.removeComordibity`;
+			td1.appendChild(select);
+			td2.appendChild(removeButton);
+			tr.appendChild(td1);
+			tr.appendChild(td2);
+			
+			table.appendChild(tr);
+
+			//this.residentVars.COMORDIBITY.push('');
+			
+		}
+		this.binds(this.controllerName,'#'+this.modalID);
+		this.bindChildObject ( this , false );
+	}
+
+
+	addVaccine () {
+		this.residentVars.VACCINATION.push({
+			VACCINE_DATE : '0000-00-00',
+			VACCINE : '',
+			//DOSE : this.residentVars.VACCINE.length,	
+		});
+		this.setVaccine();
+	}
+
+	removeVaccination (params) {
+		this.residentVars.VACCINATION.splice(params.index, 1);
+		this.setVaccine();
+	}
+
+
+	setVaccine ( ) {
+		let table = document.querySelector('#vaccine-table');
+		table.innerHTML = "";
+		for (let j in this.residentVars.VACCINATION) {
+			
+			let select = document.createElement('select');
+			let date = document.createElement('input');
+				date.type = 'date';
+				date.className = 'form-control';
+				date.dataset.valuectrl = `residentVars.VACCINATION.${j}.VACCINE_DATE`
+			select.dataset.valuectrl = `residentVars.VACCINATION.${j}.VACCINE`;
+			select.dataset.event = `${this.controllerName}.change.changeValues`;
+			select.className = 'form-control';
+			this.residentVars.VACCINATION[j].DOSE = j;
+			for (let i in this.vaccines) {
+				let sel = this.vaccines[i];
+				let option = document.createElement('option');
+				option.dataset.params = `{'index':${i}}`;
+				option.innerHTML = sel;
+				select.appendChild(option);
+			}
+			let tr = document.createElement('tr');
+			let td1 = document.createElement('td');
+			let td2 = document.createElement('td');
+			let td3 = document.createElement('td');
+			let removeButton = document.createElement('button');
+				removeButton.classList='btn btn-danger';
+				removeButton.innerText = 'x';
+				removeButton.dataset.params = '{"index":"'+j+'"}' ;
+				removeButton.dataset.event = `${this.controllerName}.click.removeVaccination`;
+			td1.appendChild(select);
+			td2.appendChild(date);
+			td3.appendChild(removeButton);
+			tr.appendChild(td1);
+			tr.appendChild(td2);
+			tr.appendChild(td3);
+			table.appendChild(tr);
+
+			//this.residentVars.COMORDIBITY.push('');
+			
+		}
+		this.binds(this.controllerName,'#'+this.modalID);
+		this.bindChildObject ( this , false );
+	}
+
+	
+
+	changeComordibity ( ...args ) {
+	
+		let alreadySelected = this.residentVars.COMORDIBITY.findIndex (x => x === args[1].srcElement.value);
+
+		if (alreadySelected > -1) {
+			alert("already selected")
+			return;
+		}
+		
+		this.changeValues();
 	}
 	
 	calcAge( args ){
@@ -228,8 +396,8 @@ export class ResidentsModalController extends Modal {
 					PUROK_NAME : this.PUROK_NAME,
 					ADDRESS : this.residentVars.ADDRESS,
 				},
-				instanceID : this.mainService.generate_id_timestamp("sm"),
 			},
+			instanceID : this.mainService.generate_id_timestamp("sm"),
 			parent : this,
 		});
 		ssm.render();
@@ -246,8 +414,9 @@ export class ResidentsModalController extends Modal {
 				controller : this.controllerName,
 				evt : ':onLinkPurok',
 				//arg : args,
-				instanceID : this.mainService.generate_id_timestamp("sm"),
 			},
+			
+			instanceID : this.mainService.generate_id_timestamp("sm"),
 			parent : this,
 		});
 		ssm.render();
@@ -284,10 +453,10 @@ export class ResidentsModalController extends Modal {
 
 	
 	onLinkPurok ( arg ){
-		if (this.residentVars.IS_FAMILY_LEADER == 0){
+		/* if (this.residentVars.IS_FAMILY_LEADER == 0){
 			alert ( "Cannot change purok!" );
 			return;
-		}
+		} */
 		let ms = arg.detail.query;
 		this.residentVars.PUROK = ms.PRK_ID;
 		this.PUROK_NAME = ms.PRK_NAME;
@@ -303,9 +472,12 @@ export class ResidentsModalController extends Modal {
 	
 	save(){
 		this.bindChildObject(this,true);
+		let origEmergency = this.residentVars.EMERGENCY;
+		this.residentVars.EMERGENCY = JSON.stringify(this.residentVars.EMERGENCY);
 		this.residentVars.FULLNAME = `${this.residentVars.LASTNAME} ${this.residentVars.FIRSTNAME} ${this.residentVars.MIDDLENAME}`;
 		let saveparams = ( ServerRequest.queryBuilder( this.mainService.object2array(this.residentVars) , this.isUpdate ? "UPDATE" : "INSERT" ) );
 		
+		console.log(saveparams);
 	
 		let sqlformems = "";
 		let valformems = [];
@@ -315,7 +487,7 @@ export class ResidentsModalController extends Modal {
 		
 		let sqlforremovedmems = "";
 		let valforremovedmems = [];
-		console.log(this.removedHHMembers)
+
 		for ( let rhh in this.removedHHMembers ){
 			let rhhsel = this.removedHHMembers[rhh];
 			//console.log(this.removedHHMembers,rhh)
@@ -353,7 +525,7 @@ export class ResidentsModalController extends Modal {
 							query_request : "INSERT",
 							values : saveparams.values
 						},	
-						{
+						/*{
 							sql : sqlformres,
 							db : 'DB',
 							query_request : "INSERT",
@@ -364,7 +536,7 @@ export class ResidentsModalController extends Modal {
 							db : 'DB',
 							query_request : "UPDATE",
 							values : valforremovedmems
-						},	
+						},	*/
 					]
 				}			
 			}	
@@ -383,7 +555,8 @@ export class ResidentsModalController extends Modal {
 				} 
 			});
 			alert("success!");
-			this.onClose();
+			//this.onClose();
+			this.residentVars.EMERGENCY = origEmergency;
 		} 
 		, ( res ) => {
 			//err

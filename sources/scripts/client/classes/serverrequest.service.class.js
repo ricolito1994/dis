@@ -120,6 +120,7 @@ export class ServerRequest {
 			for ( var index in a[i] ){
 				
 				let vals = ( typeof conditionToken != "undefined" ? '%'+a[i][index]+'%' : a[i][index] );
+				vals = Array.isArray(vals) ? JSON.stringify(vals) : vals;
 				returnObject.values.push(vals);
 				var cb = commands [ SQL_COMMAND ].callback ( index , returnObject.values[i], i, len );
 					

@@ -2,7 +2,29 @@
 <html>
 <head>
 	<?php
+	session_start();
 	$data = json_decode ($_POST['data'],false);
+	//VAR_DUMP($data);
+
+	function generateCardNumber ($ID = 123) 
+	{
+		$totalLen = 8;
+		$num = str_split($ID);
+		$strNum = $totalLen - count ($num);
+		$ctr = 0;
+		$resNumber = "";
+
+		for($i = 0 ; $i < $totalLen; $i++) {
+			if ($strNum > $i) {
+				$resNumber .= 0;
+			} else {
+				$resNumber .= $num[$ctr];
+				$ctr ++;
+			}
+		}
+		$CODE = $_SESSION['CODE'];
+		return "$CODE-$resNumber";
+	}
 	?>
 	<title></title>
 	<script type="text/javascript" src="/dis/sources/imports/scripts/qrcodejs/qrcode.min.js" ></script>
@@ -22,26 +44,25 @@
 <body>
 	<div style="height:2.125in;width:3.375in;border:1px solid black;padding:0.5%;">
 		<div style="width:69%;float:left;height:100%;">
-			<div style="height:35%;">
-				<div style="float:left;width:35%;height:100%;">
-					<img src="../../images/5Seal.webp" style="width:100%;height:100%;">
+			<div style="height:25%;">
+				<div style="float:left;width:25%;height:100%;">
+					<img src="../../images/logo_cong.png" style="width:100%;height:100%;">
 				</div>
-				<div style="float:left;width:63%;height:100%;font-size:10px;">
-					<div style="margin-top:15px;margin-left:5px;">
-						<p style="">Republic of the Philippines</p>
-						<p style="margin-top:-10px;font-size:12px;font-weight:bold;">DISTRICT 5</p>
+				<div style="float:left;width:73%;height:100%;font-size:10px;">
+					<div style="margin-top:10px;margin-left:5px;">
+						<p align="center" style="font-size:8px;">REPUBLIC OF THE PHILIPPINES</p>
+						<p align="center" style="margin-top:-10px;font-size:8px;font-weight:bold;">PROVINCE OF NEGROS OCCIDENTAL</p>
 					</div>
 				</div>
 				<div style="clear:both"></div>
 			</div>
 			<div style="height:15%;" align="center">
 				<div>
-					<B style="font-size:12px;">HEALTH CARD</B>
+					<B style="font-size:11px;">HEALTH CARD</B>
 				</div>
 				<div style="margin-top:-10px;">
-					<span style="font-size:10px;">111100001111</span>
+					<span style="font-size:10px;"><?php echo generateCardNumber($data->ID); ?></span>
 				</div>
-				
 			</div>
 			<div style="height:50%; ">
 				<div style='font-size:8px;'>
@@ -54,12 +75,30 @@
 				</div>
 				<div style='margin-top:5px;font-size:8px;'>
 					COMORDIBITY:<br>
-					<STRONG>DIABETES,HYPERTENSION</STRONG>
+					<?php 
+						$comordibity = count($data->COMORDIBITY) > 0 ? implode( ",", $data->COMORDIBITY ): 'NONE';
+						
+					?>
+					<STRONG><?php echo strtoupper($comordibity); ?></STRONG>
 				</div>
-				<div style='margin-top:5px;font-size:8px;'>
-					COVID VACCINATION:<br>
-					<STRONG>YES, 2 DOSE</STRONG>
+				<div style='margin-top:5px;font-size:8px;width:100%;'>
+					<div style='width:50%;float:left;'>
+						COVID VACCINATION:<br>
+						<?php
+						$vaccineDose = count ($data->VACCINATION);
+						
+						$vaccineDose = $vaccineDose > 0 ? "YES, $vaccineDose DOSE" : "NO";
+						
+						?>
+						<STRONG><?php echo $vaccineDose; ?></STRONG>
+					</div>
+					<div style='width:50%;float:right;'>
+						BLOOD TYPE:<br>
+						<STRONG><?PHP echo $data->BLOOD_TYPE; ?></STRONG>
+					</div>
+					<div style="clear:both"></div>
 				</div>
+				
 			</div>
 			<!--<div style="height:50%">
 				<div><span style="font-size:7px;" >NAME</span><BR>
@@ -86,6 +125,37 @@
 			<div id="qrcode_" style="width:100%;height:50%;"></div>
 			<div  style="width:100%;height:50%;background:#cccc;font-size:10px;text-align:center;">
 				1x1 PHOTO
+			</div>
+		</div>
+		
+		<div style="clear:both"></div>
+	</div>
+	<div style="height:2.125in;width:3.375in;border:1px solid black;padding:0.5%;">
+		<div style="width:100%;height:100%;">
+			<div align="center" style="height:50%;">
+				<div style="width:35%;height:100%;">
+					<img src="../../images/logo_cong.png" style="width:100%;height:100%;">
+				</div>
+			</div>
+			<div align="center" style="height:7%;">
+				<div style="width:100%;height:100%;">
+					<strong style="color:red;">IN CASE OF EMERGENCY</strong>
+				</div>
+			</div>
+			<div align="center" style="height:7%;">
+				<div style="width:100%;height:100%;">
+					<strong style="font-size:10px;"><?php echo $data->EMERGENCY->NAME; ?></strong>
+				</div>
+			</div>
+			<div align="center" style="height:7%;">
+				<div style="width:100%;height:100%;">
+					<strong style="font-size:10px;"><?php echo $data->EMERGENCY->ADDRESS; ?></strong>
+				</div>
+			</div>
+			<div align="center" style="height:5%;">
+				<div style="width:100%;height:100%;">
+					<strong style="font-size:10px;"><?php echo $data->EMERGENCY->CONTACT_NUMBER; ?></strong>
+				</div>
 			</div>
 		</div>
 		
