@@ -34,6 +34,7 @@ export class ResidentsModalController extends Modal {
 				CONTACT_NUMBER : '',
 				ADDRESS : '',
 			},
+			ITEM_IMAGE : '',
 		}
 
 		this.PUROK_NAME = this.modalData.args['PUROK_NAME'] ? this.modalData.args['PUROK_NAME'] : "" ;
@@ -104,7 +105,7 @@ export class ResidentsModalController extends Modal {
 			'JHONSON AND JHONSON`S',
 			'MODERNA VACCINE',
 		];
-		//console.log(this.houseHoldMembers );
+		//console.log(this.houseHoldMembers );;
 		
 		this.calcAge({load:true});
 	}
@@ -134,8 +135,26 @@ export class ResidentsModalController extends Modal {
 		qrcode.makeCode(this.residentVars.RESIDENT_ID);
 		this.setComordibity();
 		this.setVaccine();
-		//if(!this.modalData.instanceID)
-		//	this.addMembers();
+
+		this.tempprofpic = this.residentVars.ITEM_IMAGE == '' ? './sources/images/prof.jpg' : `${this.residentVars.ITEM_IMAGE}`;
+		this.itemtemppic =  this.tempprofpic;
+		//this.residentVars.ITEM_IMAGE = '';
+		//this.displayUnit ();
+
+		if(!this.modalData.instanceID)
+			this.addMembers();
+	}
+
+	chooselogo(){
+		$('#itemimage_pic').click();
+	}
+
+	changeProfPic(...args){
+		var reader = new FileReader();
+        reader.onload = (e) => {
+		  $('#itemimage').attr('src',e.target.result);
+        }
+       	reader.readAsDataURL(args[1].target.files[0]);
 	}
 	
 	changefamilyleaderstat(){
@@ -425,14 +444,14 @@ export class ResidentsModalController extends Modal {
 	onAddMembers( arg ){
 		let mems = arg.detail.query;
 		let index = this.houseHoldMembers.findIndex(x=>x.RESIDENT_ID == mems.RESIDENT_ID);
-		//console.log(mems);
+		console.log(mems);
 		if ( index > -1 || (mems.HH_LEADER != "" && mems.HH_LEADER != this.residentVars.RESIDENT_ID) ){
 			alert ("Has already added as family member!");
 			return;
 		}
 		
 		if ( mems.RESIDENT_ID == this.residentVars.RESIDENT_ID ){
-			alert ( "Are you silly ? you cannot add yourself as a member!" )
+			alert ( "You cannot add yourself as a member!" )
 			return;
 		}
 		
@@ -466,19 +485,24 @@ export class ResidentsModalController extends Modal {
 		ms.modal.onClose();
 	}
 	
-	changeValues(){
+	changeValues() {
 		this.bindChildObject(this,true);
 	}
 	
-	save(){
+	save() {
 		this.bindChildObject(this,true);
 		let origEmergency = this.residentVars.EMERGENCY;
 		this.residentVars.EMERGENCY = JSON.stringify(this.residentVars.EMERGENCY);
 		this.residentVars.FULLNAME = `${this.residentVars.LASTNAME} ${this.residentVars.FIRSTNAME} ${this.residentVars.MIDDLENAME}`;
+		this.residentVars.ITEM_IMAGE = this.residentVars.ITEM_IMAGE == '' ? this.itemtemppic : `/dis/sources/complist/${session_data.COMPANY_DIR}/itemimage/${this.residentVars.RESIDENT_ID}/profpic/${this.residentVars.ITEM_IMAGE.split("\\")[2]}`;
+		
 		let saveparams = ( ServerRequest.queryBuilder( this.mainService.object2array(this.residentVars) , this.isUpdate ? "UPDATE" : "INSERT" ) );
 		
-		console.log(saveparams);
-	
+		
+		//console.log(this.residentVars.ITEM_IMAGE);
+
+		//return;
+
 		let sqlformems = "";
 		let valformems = [];
 		
@@ -525,7 +549,7 @@ export class ResidentsModalController extends Modal {
 							query_request : "INSERT",
 							values : saveparams.values
 						},	
-						/*{
+						{
 							sql : sqlformres,
 							db : 'DB',
 							query_request : "INSERT",
@@ -536,7 +560,7 @@ export class ResidentsModalController extends Modal {
 							db : 'DB',
 							query_request : "UPDATE",
 							values : valforremovedmems
-						},	*/
+						},
 					]
 				}			
 			}	
@@ -546,17 +570,37 @@ export class ResidentsModalController extends Modal {
 				dataQuery.data.data.REQUEST_QUERY.splice ( dq , 1 );
 		}
 		
-		//console.log(dataQuery)
 		this.mainService.serverRequest( dataQuery , ( res ) => {
-			MainService.EventObject[this.modalData.parent.controllerName].dispatch (`${this.modalData.onSearchEvent}` , {
-				detail : {
-					query : {
-					}
-				} 
+
+			let formData = new FormData();
+				formData.append('file',$('#itemimage_pic')[0].files[0]);
+				formData.append('dir',`${session_data.COMPANY_DIR}/itemimage/${this.residentVars.RESIDENT_ID}/profpic/`);
+				formData.append('createdir',true);
+				formData.append('request','file_upload');
+
+
+			this.mainService.serverRequestFileUpload( {
+				type: "POST",
+				url : this.mainService.urls["generic"]['url'],
+				data : {
+					data : {
+						formdata : formData,
+					}			
+				}
+			} , 
+			( res ) => {
+				MainService.EventObject[this.modalData.parent.controllerName].dispatch (`${this.modalData.onSearchEvent}` , {
+					detail : {
+						query : {
+						}
+					} 
+				});
+				alert("success!");
+				//this.onClose();
+				this.residentVars.EMERGENCY = origEmergency;
 			});
-			alert("success!");
-			//this.onClose();
-			this.residentVars.EMERGENCY = origEmergency;
+
+			
 		} 
 		, ( res ) => {
 			//err

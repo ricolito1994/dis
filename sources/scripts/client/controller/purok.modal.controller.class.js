@@ -52,8 +52,8 @@ export class PurokModalController extends Modal {
 				controller : this.controllerName,
 				evt : ':onSelectPrkLeader',
 				//arg : args,
-				instanceID : this.mainService.generate_id_timestamp("sm"),
 			},
+			instanceID : this.mainService.generate_id_timestamp("md"),
 			parent : this,
 		});
 		ssm.render();
@@ -121,7 +121,6 @@ export class PurokModalController extends Modal {
 		};
 		//console.log(this.isUpdate)
 		this.mainService.serverRequest( dataQuery , ( res ) => {
-			console.log(res);
 			MainService.EventObject[this.modalData.parent.controllerName].dispatch (`${this.modalData.onSearchEvent}` , {
 				detail : {
 					query : {

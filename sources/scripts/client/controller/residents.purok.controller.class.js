@@ -148,7 +148,7 @@ export class ResidentsPurokController extends Modal {
 			parent : this,
 			isUpdate : args.PRK_ID ? true : false,
 			args : args.PRK_ID ? args : {},
-			instanceID : this.mainService.generate_id_timestamp("res"),
+			//instanceID : this.mainService.generate_id_timestamp("res"),
 			onSearchEvent : `${this.controllerName}:onUpdateTable`,
 		});
 		usm.render();

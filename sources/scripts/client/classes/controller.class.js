@@ -119,6 +119,8 @@ export class Controller{
 		
 		if ( !MainService.EventObject [ this.controllerName ] ){
 			this.eh = new EventHandler(this);
+
+			//console.log(`this.controllerName `,	this.controllerName )
 			
 			let funcs = Object.getOwnPropertyNames(Object.getPrototypeOf(this));
 			//console.log(this,funcs);
