@@ -7,7 +7,7 @@ import { LoadingModal } from "./loading.modal.controller.class.js";
 import { ResidentsModalController } from "./residents.modal.controller.class.js"
 import { PurokModalController } from "./purok.modal.controller.class.js"
  
-export class SearchModal extends Modal{
+export class SearchModal extends Modal {
 	
 	constructor ( modalData ){
 		super ( modalData );
@@ -114,7 +114,7 @@ export class SearchModal extends Modal{
 									}
 								]
 							},
-							{
+							/* {
 								createElement : 'button',
 								attributes : [			
 									{
@@ -125,7 +125,6 @@ export class SearchModal extends Modal{
 										attribute : 'click',
 										type : 'event',
 										value : (...args )=> {
-											
 											let usm = new ResidentsModalController({
 												modalID :  "residents-modal-2",
 												controllerName : "ResidentsModalController2",
@@ -136,7 +135,7 @@ export class SearchModal extends Modal{
 												instanceID : this.mainService.generate_id_timestamp("res"),
 												onSearch : true,
 												brgyargs : this.params.brgyargs,
-												onSearchEvent :  this.params.instanceID ? `${this.params.instanceID}:onUpdateSearchTable` : "searchmodal:onUpdateSearchTable",
+												onSearchEvent : this.modalData.instanceID ? `SearchModal${this.modalData.instanceID}:onUpdateSearchTable` : "searchmodal:onUpdateSearchTable",
 											});
 											usm.render();
 										},
@@ -154,7 +153,7 @@ export class SearchModal extends Modal{
 										]
 									}
 								]
-							}
+							} */
 							
 						],
 					}
@@ -679,10 +678,10 @@ export class SearchModal extends Modal{
 												template : "/dis/sources/templates/modal/purok.modal.template.html",
 												parent : this,
 												isUpdate : args ? false : true,
-												args : args?args : {},
-												instanceID : this.mainService.generate_id_timestamp("res"),
+												args : args ? args : {},
+												//instanceID : this.mainService.generate_id_timestamp("res"),
 												onSearch : true,
-												onSearchEvent :  this.params.instanceID ? `${this.params.instanceID}:onUpdateSearchTable` : "searchmodal:onUpdateSearchTable",
+												onSearchEvent :  this.modalData.instanceID ? `SearchModal${this.modalData.instanceID}:onUpdateSearchTable` : "searchmodal:onUpdateSearchTable",
 											});
 											usm.render();
 										},
@@ -934,30 +933,36 @@ export class SearchModal extends Modal{
 	}
 	
 	constructs(){
-		//console.log(this.params);
+		console.log(this.modalData.instanceID);
 		
-		if(this.params.instanceID){
-			$("#search-modal").attr("id",this.params.instanceID);
+		if(this.modalData.instanceID) {
+			//console.log('this.modalData.instanceID' , this.modalData.instanceID)
+			//$("#search-modal").attr("id",`#SearchModal${this.modalData.instanceID}`);
 			//console.log($("#"+this.params.instanceID).data("controller"))
-			$("#"+this.params.instanceID).data("controller",this.params.instanceID);
+			//$("#"+this.params.instanceID).data("controller",`SearchModal${this.modalData.instanceID}`);
 			//console.log($("#"+this.params.instanceID).data("controller"))
+			document.querySelector('#search-modal').dataset.controller = `SearchModal${this.modalData.instanceID}`
+			document.querySelector('#search-modal').id = `SearchModal${this.modalData.instanceID}`;
 		}
 		
-		//console.log($("#"+this.params.instanceID).data());
-		
-		this.mainService.children(this.fieldsDataTable[ this.params.type ][ "search_dom" ],document.querySelector(( this.params.instanceID ? "#"+this.params.instanceID+" #modal-search-pane" : '#modal-search-pane')) ,{});
-		
-		this.dataTable = new DataTableService({
-			template : "/dis/sources/templates/section/datatable.table.section.template.html",
-			controller : this,
-			controllername : "",
-			tableID : "dttable",
-			service : this.mainService,
-			parentDiv : ( this.params.instanceID ? "#"+this.params.instanceID+" #searchtablemodal" : `#searchtablemodal` ),
-			filterElems : [],
-			fields : this.fieldsDataTable[ this.params.type ][ "fields" ],
-		});
-		
-		this.init ("request");
+		//console.log(document.querySelector(`#SearchModal${this.modalData.instanceID}`));
+
+		setTimeout(() => {
+			this.mainService.children(this.fieldsDataTable[ this.params.type ][ "search_dom" ], 
+				document.querySelector(( this.modalData.instanceID ? `#SearchModal${this.modalData.instanceID}`+" #modal-search-pane" : '#modal-search-pane')) ,{});
+			
+			this.dataTable = new DataTableService({
+				template : "/dis/sources/templates/section/datatable.table.section.template.html",
+				controller : this,
+				controllername : "",
+				tableID : "dttable",
+				service : this.mainService,
+				parentDiv : ( this.params.instanceID ? `#SearchModal${this.modalData.instanceID}`+" #searchtablemodal" : `#searchtablemodal` ),
+				filterElems : [],
+				fields : this.fieldsDataTable[ this.params.type ][ "fields" ],
+			});
+			
+			this.init ("request");
+		},100);
 	}
 }

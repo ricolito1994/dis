@@ -4,7 +4,6 @@
 	<?php
 	session_start();
 	$data = json_decode ($_POST['data'],false);
-	//VAR_DUMP($data);
 
 	function generateCardNumber ($ID = 123) 
 	{
@@ -124,7 +123,11 @@
 		<div style="width:30%;float:right;height:100%;">
 			<div id="qrcode_" style="width:100%;height:50%;"></div>
 			<div  style="width:100%;height:50%;background:#cccc;font-size:10px;text-align:center;">
-				1x1 PHOTO
+				<?php if ($data->ITEM_IMAGE == "") { ?>
+					1x1 PHOTO
+				<?php } else { ?>
+					<img src="<?php echo $data->ITEM_IMAGE; ?>" style="height:100%;width:100%;"/>
+				<?php } ?>
 			</div>
 		</div>
 		

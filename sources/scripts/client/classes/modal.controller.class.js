@@ -1,6 +1,6 @@
 import { Controller } from "./controller.class.js";
 
-export class Modal extends Controller{
+export class Modal extends Controller {
 	
 	constructor ( modalData ){
 		super( modalData.controllerName , modalData.parent.mainService );
@@ -16,13 +16,17 @@ export class Modal extends Controller{
 	render(){
 		this.service.loadTemplate(this.template , "main-div" , ( ) => {
 			$("#"+this.modalData.modalID).modal();
+			
+			
+			if(this.modalData.instanceID){
+				
+				this.modalID = 'SearchModal'+this.modalData.instanceID;
+				this.controllerName = 'SearchModal'+this.modalData.instanceID;
+				console.log(this.controllerName,this.modalID );
+			}
+
 			this.listen();
 			this.constructs();
-			
-			if(this.modalData.params){
-				this.modalID = this.modalData.params.instanceID ? this.modalData.params.instanceID : this.modalData.modalID;
-				this.controllerName = this.modalData.params.instanceID ? this.modalData.params.instanceID : this.modalData.controllerName;
-			}
 			
 			
 			this.binds(this.controllerName,'#'+this.modalID);

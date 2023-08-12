@@ -71,8 +71,8 @@ export class ResidentsSectionController extends Modal {
 				controller : this.controllerName,
 				evt : ':onLinkPurok',
 				//arg : args,
-				instanceID : this.mainService.generate_id_timestamp("sm"),
 			},
+			instanceID : this.mainService.generate_id_timestamp("sm"),
 			parent : this,
 		});
 		ssm.render();
@@ -89,8 +89,9 @@ export class ResidentsSectionController extends Modal {
 				controller : this.controllerName,
 				evt : arg.onevt ? arg.onevt : ':onLinkFL',
 				//arg : args,
-				instanceID : this.mainService.generate_id_timestamp("sm"),
+				
 			},
+			instanceID : this.mainService.generate_id_timestamp("sm"),
 			parent : this,
 		});
 		ssm.render();
@@ -116,10 +117,10 @@ export class ResidentsSectionController extends Modal {
 									attribute : "src",
 									value : ( selData ) => {
 										//console.log(selData);
-										//if (selData['IMG'] && selData['IMG']=='')
-										return '/dis/sources/images/prof.jpg';
-										//else
-										//return '';
+										if (selData['ITEM_IMAGE']=='')
+											return '/dis/sources/images/prof.jpg';
+										else
+											return selData['ITEM_IMAGE'];
 									},
 								},
 								{
