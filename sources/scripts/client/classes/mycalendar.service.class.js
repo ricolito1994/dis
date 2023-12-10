@@ -5,7 +5,20 @@ export class CalendarService extends Controller {
 	constructor ( params ){
 		super ( 'calendar' , params.parent.mainService );
 		this.parent = params.parent;
-		this.months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+		this.months = [
+			'January',
+			'February',
+			'March',
+			'April',
+			'May',
+			'June',
+			'July',
+			'August',
+			'September',
+			'October',
+			'November',
+			'December'
+		];
 		this.service = this.parent.mainService;
 		this.calendarTemplate = params.calendarTemplate;
 		this.parentDiv = params.parentDiv;

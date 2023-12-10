@@ -401,7 +401,7 @@ export class ResidentsModalController extends Modal {
 		let ssm = new SearchModal ({
 			modalID :  "search-modal",
 			controllerName : "searchmodal",
-			template : "/bps/sources/templates/modal/search.modal.template.html",
+			template : "/dis/sources/templates/modal/search.modal.template.html",
 			params : {
 				type : arg.search ? arg.search : 'resident',
 				action : 'link',
