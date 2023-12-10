@@ -13,16 +13,14 @@ export class SideMenuBar extends Modal{
 		this.toggle();
 		this.populateSideMenuBar(this.isRestored , true);
 		this.navigate({index:this.modalData.defaultIndex});
-		//$(`[data-toggle="tooltip"]`).tooltip();
 	}
 	//override
 	init(){
 	}
+	
 	//animate width of sidebar and the opposite
 	toggle(){
 		if(!this.isRestored){
-			//$(this.modalData.menuParentDiv).animate({"width":"4%"},1000);
-			//$(this.modalData.oppositeDiv).animate({"width":"95.5%"},1000);
 			$(this.modalData.menuParentDiv).css("width","4%");
 			$('#'+this.modalData.oppositeDiv).css("width","96%");
 			$("#side-menu-bar-toggle-btn").attr("align","center");
@@ -30,8 +28,6 @@ export class SideMenuBar extends Modal{
 			this.isRestored = true;
 		}
 		else{
-			//$(this.modalData.menuParentDiv).animate({"width":"15%"},1000);
-			//$(this.modalData.oppositeDiv).animate({"width":"85%"},1000);
 			$(this.modalData.menuParentDiv).css("width","15%");
 			$('#'+this.modalData.oppositeDiv).css("width","85%");
 			$("#side-menu-bar-toggle-btn").attr("align","right");
@@ -96,7 +92,6 @@ export class SideMenuBar extends Modal{
 					selAnchor = document.querySelector ( `${this.modalData.menuParentDiv} ul li > a#_${index}` );
 					selAnchor.className = "active";
 					this.modalData.args.menus[i].page.object.renderDiv(this.modalData.oppositeDiv);
-					//console.log(this.modalData.oppositeDiv)
 					this.modalData.args.menus[i].page.isRendered = true;
 				}
 				else{
@@ -105,7 +100,6 @@ export class SideMenuBar extends Modal{
 			}
 			else{
 				selAnchor.className = "";
-				//console.log(this.modalData.args.menus[i].page.object)
 				this.modalData.args.menus[i].page.object.destroyModal();
 				this.modalData.args.menus[i].page.isRendered = false;
 			}

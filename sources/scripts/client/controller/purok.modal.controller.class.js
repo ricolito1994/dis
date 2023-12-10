@@ -45,15 +45,15 @@ export class PurokModalController extends Modal {
 		let ssm = new SearchModal ({
 			modalID :  "search-modal",
 			controllerName : "searchmodal",
-			template : "/bps/sources/templates/modal/search.modal.template.html",
+			template : "/dis/sources/templates/modal/search.modal.template.html",
 			params : {
-				type : 'resident',
+				type : "purok",
 				action : 'link',
 				controller : this.controllerName,
-				evt : ':onSelectPrkLeader',
+				evt : ':onLinkPurok',
 				//arg : args,
 			},
-			instanceID : this.mainService.generate_id_timestamp("md"),
+			instanceID : this.mainService.generate_id_timestamp("sm"),
 			parent : this,
 		});
 		ssm.render();

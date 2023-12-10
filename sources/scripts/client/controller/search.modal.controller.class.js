@@ -502,7 +502,8 @@ export class SearchModal extends Modal {
 											//console.log ( this.searchParams , arg );
 											let actions = {
 												link : ( ) => {
-													MainService.EventObject[this.params.controller].dispatch (this.params.controller+this.params.evt , {
+													MainService.EventObject[this.params.controller]
+														.dispatch (this.params.controller+this.params.evt , {
 														detail : {
 															query : {
 																FULLNAME : arg['FULLNAME'],
