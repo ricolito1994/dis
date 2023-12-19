@@ -563,6 +563,273 @@ export class SearchModal extends Modal {
 					}		
 				}
 			},
+
+			"resident_all" :{
+				"search_param" : [
+					{
+						value : "",
+						placeholder : "%_placeholder_%",
+					}
+				],
+				"search_dom" : [
+					{
+						createElement : 'div',
+						attributes : [
+							{
+								attribute : 'className',
+								value : 'row col-md-7',
+							},
+							{
+								attribute : 'id',
+								value : 'dttablefilter',
+							},
+							
+						],
+						children : [
+								{
+									createElement : 'div',
+									attributes : [
+										{
+											attribute : 'className',
+											value : "col-sm-12",
+										}
+									],
+									children : [
+										{
+											createElement : 'input',
+											attributes : [
+												{
+													attribute : 'type',
+													value : 'text',
+												},
+												{
+													attribute : 'className',
+													value : 'form-control',
+												},
+												{
+													attribute : 'placeholder',
+													value : 'Search here...',
+												},
+												{
+													attribute : 'valuectrl',
+													type : 'dataset',
+													value : `fieldsDataTable.resident_all.search_param.0.value`,
+												},
+												{
+													attribute : 'keyup',
+													type : 'event',
+													value : ( )=> {
+														this.changefilter("request");
+													},
+												}
+												
+											],
+										}
+									],
+								}
+						],
+					},
+					
+						
+					{
+						createElement : 'div',
+						attributes : [
+							{
+								attribute : 'className',
+								value : "row col-md-5 action-buttons",
+							}
+						],
+						children : [
+							{
+								createElement : 'button',
+								attributes : [			
+									{
+										attribute : 'className',
+										value : 'btn btn-warning',
+									},			
+								],
+								children : [
+									{
+										createElement : 'b',
+										attributes : [
+											{
+												attribute : 'innerHTML',
+												value : '<i class="icon-refresh"></i> Refresh Table'
+											}
+										]
+									}
+								]
+							},
+							/* {
+								createElement : 'button',
+								attributes : [			
+									{
+										attribute : 'className',
+										value : 'btn btn-primary',
+									},	
+									{
+										attribute : 'click',
+										type : 'event',
+										value : (...args )=> {
+											let usm = new ResidentsModalController({
+												modalID :  "residents-modal-2",
+												controllerName : "ResidentsModalController2",
+												template : "/dis/sources/templates/modal/residents.modal.template.2.html",
+												parent : this,
+												isUpdate : args ? false : true,
+												args : args?args : {},
+												instanceID : this.mainService.generate_id_timestamp("res"),
+												onSearch : true,
+												brgyargs : this.params.brgyargs,
+												onSearchEvent : this.modalData.instanceID ? `SearchModal${this.modalData.instanceID}:onUpdateSearchTable` : "searchmodal:onUpdateSearchTable",
+											});
+											usm.render();
+										},
+									}
+								],
+								children : [
+									{
+										createElement : 'b',
+										attributes : [
+											{
+												attribute : 'innerHTML',
+												value : '<i class="icon-plus"></i> Add New'
+											},
+											
+										]
+									}
+								]
+							} */
+							
+						],
+					}
+						
+					
+				],
+				"fields" : [
+					{
+						head : "FULLNAME",
+						elements : [
+							{
+								createElement : "b",
+								attributes : [
+									{
+										attribute : "innerText",
+										value : ( selData ) => {
+											return selData['FULLNAME'];
+										},
+									}
+								]
+							}
+						]
+					},
+					{
+						head : "BIRTHDAY",
+						elements : [
+							{
+								createElement : "b",
+								attributes : [
+									{
+										attribute : "innerText",
+										value : ( selData ) => {
+											return selData['BIRTHDAY'];
+										},
+									}
+								]
+							}
+						]
+					},
+					{
+						head : "Address",
+						elements : [
+							{
+								createElement : "b",
+								attributes : [
+									{
+										attribute : "innerText",
+										value : ( selData ) => {
+											return selData['ADDRESS'];
+										},
+									}
+								]
+							}
+						]
+					},
+					{
+						head : "Actions",
+						elements : [
+							{	
+								createElement : "a",
+								attributes : [
+									{
+										attribute: "href",
+										value : "javascript:void(0);",
+									},
+									{
+										attribute: "className",
+										value : "btn btn-success",
+									},
+									{
+										type : "event",
+										attribute : "click",
+										value : ( arg ) => {
+											//console.log ( this.searchParams , arg );
+											let actions = {
+												link : ( ) => {
+													MainService.EventObject[this.params.controller].dispatch (this.params.controller+this.params.evt , {
+														detail : {
+															query : {
+																FULLNAME : arg['FULLNAME'],
+																RESIDENT_ID : arg['RESIDENT_ID'],
+																//MEMBER_ID : arg['RESIDENT_ID'],
+																BIRTHDAY : arg['BIRTHDAY'],
+																HH_LEADER : arg['HH_LEADER'],
+																context : this.parent,
+																modal : this,
+															}
+														} 
+													});
+													//this.onClose();
+												}
+											};
+											actions [ this.params.action ]( );
+										},
+									}
+								],
+								children : [
+									{
+										createElement : "i",
+										attributes : [
+											{
+												attribute: "className",
+												value : "icon-plus",
+											}
+										]
+									}
+								]
+							},
+							
+						]
+					},
+				],
+				request : {
+					type: "POST",
+					url : this.mainService.urls["generic"].url,
+					data : {
+						data : {
+							request : 'generic',
+							REQUEST_QUERY : [
+								{
+									sql : `SELECT * FROM dis.barangay_res_setup WHERE FULLNAME LIKE ? order by ID desc`,
+									query_request : 'GET',
+									index : 'result',
+									values : ['%%']
+								},
+							]
+						}
+					}		
+				}
+			},
 			
 			"purok" :{
 				"search_param" : [
@@ -672,7 +939,6 @@ export class SearchModal extends Modal {
 										attribute : 'click',
 										type : 'event',
 										value : (...args )=> {
-											
 											let usm = new PurokModalController({
 												modalID :  "purok-modal",
 												controllerName : "PurokModalController",
@@ -823,7 +1089,7 @@ export class SearchModal extends Modal {
 	
 	onUpdateSearchTable( ...args ){
 		//console.log("SssS",args);
-		this.changefilter("request" , "refresh");
+		this.changefilter("request", "refresh");
 	}
 	
 	/* getWarehouse ( whcode ) {
@@ -865,8 +1131,6 @@ export class SearchModal extends Modal {
 		let search_params = this.fieldsDataTable[ this.params.type ][ "search_param" ];
 		let dataQuery = this.fieldsDataTable[ this.params.type ][ request ];
 		let dq = dataQuery.data.data.REQUEST_QUERY[0].values;	
-		
-		
 		//console.log(search_params,dq);
 		//this.searchObject = this.fieldsDataTable[ this.params.type ];
 		//dataQuery.data.data.REQUEST_QUERY[0].values[0] = '%'+this.fds.gds+'%';
@@ -899,7 +1163,7 @@ export class SearchModal extends Modal {
 			}
 			
 		}
-		//console.log(dataQuery.data.data.REQUEST_QUERY);
+		
 		this.mainService.serverRequest( dataQuery , ( res ) => {
 			
 			setTimeout( ( ) => {
@@ -927,9 +1191,10 @@ export class SearchModal extends Modal {
 				this.fieldsDataTable[this.params.type].search_param[i].value = "";
 			}
 			
-			this.bindChildObject ( this , false );
+			this.bindChildObject (this, false);
 		}
-		this.bindChildObject(this,this.elem);
+		console.log(this);
+		this.bindChildObject(this, this.elem);
 		this.init(request);
 	}
 	
@@ -942,15 +1207,14 @@ export class SearchModal extends Modal {
 			//console.log($("#"+this.params.instanceID).data("controller"))
 			//$("#"+this.params.instanceID).data("controller",`SearchModal${this.modalData.instanceID}`);
 			//console.log($("#"+this.params.instanceID).data("controller"))
-			document.querySelector('#search-modal').dataset.controller = `SearchModal${this.modalData.instanceID}`
-			document.querySelector('#search-modal').id = `SearchModal${this.modalData.instanceID}`;
+			//document.querySelector('#search-modal').dataset.controller = `SearchModal${this.modalData.instanceID}`
+			//document.querySelector('#search-modal').id = `SearchModal${this.modalData.instanceID}`;
 		}
 		
 		//console.log(document.querySelector(`#SearchModal${this.modalData.instanceID}`));
-
+		let searchDom = document.querySelector(( this.modalData.instanceID ? `#SearchModal${this.modalData.instanceID} #modal-search-pane` : '#modal-search-pane'));
 		setTimeout(() => {
-			this.mainService.children(this.fieldsDataTable[ this.params.type ][ "search_dom" ], 
-				document.querySelector(( this.modalData.instanceID ? `#SearchModal${this.modalData.instanceID}`+" #modal-search-pane" : '#modal-search-pane')) ,{});
+			this.mainService.children(this.fieldsDataTable[this.params.type]["search_dom"], searchDom,{});
 			
 			this.dataTable = new DataTableService({
 				template : "/dis/sources/templates/section/datatable.table.section.template.html",
@@ -964,6 +1228,6 @@ export class SearchModal extends Modal {
 			});
 			
 			this.init ("request");
-		},100);
+		}, 300);
 	}
 }

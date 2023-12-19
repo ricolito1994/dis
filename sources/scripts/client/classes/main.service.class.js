@@ -902,6 +902,213 @@ export class MainService {
 		return this.getCurrentDate().split('-')[0];
 	}
 	
+	getHHMembers (HH_LEADER_ID) {
+		let dataQuery = {
+			type: "POST",
+			url : this.urls["generic"].url,
+			data : {
+				data : {
+					request : 'generic',
+					REQUEST_QUERY : [
+						{
+							sql : `SELECT * FROM dis.barangay_res_setup w where w.HH_LEADER = ?`,
+							db : 'DB',
+							query_request : 'GET',
+							index : 'result',
+							values : [HH_LEADER_ID],
+						},	
+					]
+				}		
+			}
+		};
+		return new Promise ( (resolve, reject) => {
+			this.serverRequest( dataQuery , ( res ) => {
+				setTimeout( ( ) => {
+					resolve((JSON.parse(res))['result']);
+				},110);
+			} 
+			, ( res ) => {
+				//err
+				reject(res);
+			});	
+		});
+	}
+
+	getResidentData (RESIDENT_ID) {
+		let dataQuery = {
+			type: "POST",
+			url : this.urls["generic"].url,
+			data : {
+				data : {
+					request : 'generic',
+					REQUEST_QUERY : [
+						{
+							sql : `SELECT * FROM dis.barangay_res_setup w where w.RESIDENT_ID = ?`,
+							db : 'DB',
+							query_request : 'GET',
+							index : 'result',
+							values : [RESIDENT_ID],
+						},	
+					]
+				}		
+			}
+		};
+		return new Promise ( (resolve, reject) => {
+			this.serverRequest( dataQuery , ( res ) => {
+				setTimeout( ( ) => {
+					resolve((JSON.parse(res))['result'][0]);
+				},110);
+			} 
+			, ( res ) => {
+				//err
+				reject(res);
+			});	
+		});
+	}
 	
+
+	getPurokData (PUROK_ID) {
+		let dataQuery = {
+			type: "POST",
+			url : this.urls["generic"].url,
+			data : {
+				data : {
+					request : 'generic',
+					REQUEST_QUERY : [
+						{
+							sql : `SELECT * FROM dis.barangay_prk_setup w where w.PRK_ID = ?`,
+							db : 'DB',
+							query_request : 'GET',
+							index : 'result',
+							values : [PUROK_ID],
+						},	
+					]
+				}		
+			}
+		};
+		return new Promise ( (resolve, reject) => {
+			this.serverRequest( dataQuery , ( res ) => {
+				setTimeout( ( ) => {
+					resolve((JSON.parse(res))['result'][0]);
+				},110);
+			} 
+			, ( res ) => {
+				//err
+				reject(res);
+			});	
+		});
+	}
+
+
+	checkLocationDataExists (	
+		FOREIGN_KEY , 	
+		PIVOT_TABLE, 	
+		FOREIGN_KEY_FIELD,
+	) {
+		let dataQuery = {
+			type: "POST",
+			url : this.urls["generic"].url,
+			data : {
+				data : {
+					request : 'generic',
+					REQUEST_QUERY : [
+						{
+							sql : `SELECT ID FROM dis.barangay_land_marks w where 
+								w.FOREIGN_KEY = ? and
+								w.PIVOT_TABLE = ? and
+								w.FOREIGN_KEY_FIELD = ?`,
+							db : 'DB',
+							query_request : 'GET',
+							index : 'result',
+							values : [
+								FOREIGN_KEY , 	
+								PIVOT_TABLE, 	
+								FOREIGN_KEY_FIELD,
+							],
+						},	
+					]
+				}		
+			}
+		};
+		return new Promise ( (resolve, reject) => {
+			this.serverRequest( dataQuery , ( res ) => {
+				setTimeout( ( ) => {
+					resolve((JSON.parse(res))['result'][0]);
+				},110);
+			} 
+			, ( res ) => {
+				//err
+				reject(res);
+			});	
+		});
+	}
 	
+	getLocationData (	
+		FOREIGN_KEY , 	
+		PIVOT_TABLE, 	
+		FOREIGN_KEY_FIELD,
+	) {
+		let dataQuery = {
+			type: "POST",
+			url : this.urls["generic"].url,
+			data : {
+				data : {
+					request : 'generic',
+					REQUEST_QUERY : [
+						{
+							sql : `SELECT * FROM dis.${PIVOT_TABLE} w where w.${FOREIGN_KEY_FIELD} = ?`,
+							db : 'DB',
+							query_request : 'GET',
+							index : 'result',
+							values : [FOREIGN_KEY],
+						},	
+					]
+				}		
+			}
+		};
+		return new Promise ( (resolve, reject) => {
+			this.serverRequest( dataQuery , ( res ) => {
+				setTimeout( ( ) => {
+					resolve((JSON.parse(res))['result'][0]);
+				},110);
+			} 
+			, ( res ) => {
+				//err
+				reject(res);
+			});	
+		});
+	}
+
+
+	getLocations () {
+		let dataQuery = {
+			type: "POST",
+			url : this.urls["generic"].url,
+			data : {
+				data : {
+					request : 'generic',
+					REQUEST_QUERY : [
+						{
+							sql : `SELECT * FROM dis.barangay_land_marks WHERE ?`,
+							db : 'DB',
+							query_request : 'GET',
+							index : 'result',
+							values : [1],
+						},	
+					]
+				}		
+			}
+		};
+		return new Promise ( (resolve, reject) => {
+			this.serverRequest( dataQuery , ( res ) => {
+				setTimeout( ( ) => {
+					resolve((JSON.parse(res))['result']);
+				},110);
+			} 
+			, ( res ) => {
+				//err
+				reject(res);
+			});	
+		});
+	}
 }

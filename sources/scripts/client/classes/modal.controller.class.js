@@ -16,23 +16,20 @@ export class Modal extends Controller {
 	render(){
 		this.service.loadTemplate(this.template , "main-div" , ( ) => {
 			$("#"+this.modalData.modalID).modal();
-			
-			
 			if(this.modalData.instanceID){
-				
 				this.modalID = 'SearchModal'+this.modalData.instanceID;
 				this.controllerName = 'SearchModal'+this.modalData.instanceID;
-				console.log(this.controllerName,this.modalID );
+				document.querySelector('#search-modal').dataset.controller = `SearchModal${this.modalData.instanceID}`
+				document.querySelector('#search-modal').id = `SearchModal${this.modalData.instanceID}`;
 			}
-
 			this.listen();
 			this.constructs();
-			
-			
-			this.binds(this.controllerName,'#'+this.modalID);
-			/* automatically populate schoolyear options */
-			this.populatesy ( document.querySelector ( 'div#'+this.modalID ).children , this.controllerName );
-			this.bindChildObject ( this , false );
+			setTimeout(() => {
+				this.binds(this.controllerName, '#'+this.modalID);
+				/* automatically populate schoolyear options */
+				//this.populatesy (document.querySelector ( 'div#'+this.modalID ).children, this.controllerName);
+				this.bindChildObject ( this , false );
+			},300);
 			
 		},true);
 	}
