@@ -1,9 +1,9 @@
 import { Modal } from "../classes/modal.controller.class.js";
 import { GoogleMapsAPI } from "../classes/google.maps.api.class.js";
 import { NewLocationModalController } from "../controller/new.location.modal.controller.class.js";
-//import { SearchModal } from "./search.modal.controller.class.js";
+import { ResidentSearchModal } from "../controller/residents.search.modal.controller.js";
 
-export class GoogleMapsAPIWidget extends Modal{
+export class GoogleMapsAPIWidget extends Modal {
 	
 	constructor ( modalData ){
 		super (modalData);
@@ -22,65 +22,53 @@ export class GoogleMapsAPIWidget extends Modal{
 				
 			}
 		}
-		this.gmap = new GoogleMapsAPI ( this.modalData.args );
+		this.gmap = new GoogleMapsAPI(this.modalData.args);
 		this.gmap.loadLocations();
 	}	
 	
 	/* result from a query */
-	loadLocations ( ){
-		/* return new Promise ( ( resolve , reject ) => {
-			let requestCheck = {
-				type: "POST",
-				url : this.mainService.urls["generic"].url,
-				data : {
-					data : {
-						request : 'generic',
-						REQUEST_QUERY : [
-							{
-								sql : `select * FROM bps.person WHERE COMPANY_CODE = ?`,
-								db : 'DB',
-								query_request : "GET",
-								index : "t",
-								values : [session_data.COMPANY_CODE]
-							},	
-						]
-					}
-							
+	loadLocations () {
+		return new Promise ( async (resolve, reject) => {
+			try {
+				let locations = [];
+				let DefaultLocation = {
+					LATITUDE: this.modalData.args.LAT,
+					LONGITUDE: this.modalData.args.LNG,
+					VALUE: {
+						content : 
+							`<div style="font-size:20px;text-align:center">
+								<img width="40" src="/dis/sources/complist/mansilingan_bcd/logos/${session_data.BARANGAY_LOGO}">
+							</div>
+							<div class="shadow-marker" style="font-size:15px;text-align:center;">
+								${session_data.BARANGAY_NAME}
+							</div>`,
+					},
+					LID: 1,
+				};
+				locations.push(DefaultLocation);
+				let addedLocations = await this.mainService.getLocations();
+				for (let location in addedLocations) {
+					location = addedLocations[location];
+					let locdata = {
+						LATITUDE : location.LAT,
+						LONGITUDE : location.LNG,
+						VALUE : {
+							content: `<div style="font-size:20px;text-align:center">${location.ICON}</div>`
+						},
+						LID : location.FOREIGN_KEY,
+						ARG : location,
+					};
+					locations.push(locdata);
 				}
-			};
-			this.mainService.serverRequest ( requestCheck , ( args ) => {
-				let res = JSON.parse ( args );
-				if (res.t.length > 0)
-					resolve ( res.t );
-				else
-					reject ("lamas suso");
-			});
-		}); */
-		return new Promise ( ( resolve , reject ) => {
-			let locations = [];
-			let DefaultLocation = {
-				LATITUDE : this.modalData.args.LAT,
-				LONGITUDE : this.modalData.args.LNG,
-				VALUE : {
-					content : 
-						`<div style="font-size:20px;text-align:center"><img width="40" src="/dis/sources/complist/mansilingan_bcd/logos/${session_data.BARANGAY_LOGO}"></div>
-						<div class="shadow-marker" style="font-size:15px;text-align:center;">${session_data.BARANGAY_NAME}</div>`,
-				}
-			};
-			
-			locations.push ( DefaultLocation );
-			
-			if (true)
-				resolve ( locations );
-			else
-				reject ( "error" );
-			
+				resolve(locations);
+			} catch (e) {
+				reject(e);
+			}
 		})
 	}
 	
-	
-	removeLocation ( mkid ){
-		/* return new Promise ( ( resolve , reject ) => {
+	removeLocation (mkid){
+		return new Promise ( ( resolve , reject ) => {
 			let requestCheck = {
 				type: "POST",
 				url : this.mainService.urls["generic"].url,
@@ -89,9 +77,9 @@ export class GoogleMapsAPIWidget extends Modal{
 						request : 'generic',
 						REQUEST_QUERY : [
 							{
-								sql : `delete FROM bps.person WHERE MKID = ? AND COMPANY_CODE = ?`,
+								sql : `delete FROM dis.barangay_land_marks WHERE FOREIGN_KEY = ?`,
 								db : 'DB',
-								values : [mkid , session_data.COMPANY_CODE]
+								values : [mkid]
 							},	
 						]
 					}
@@ -99,9 +87,9 @@ export class GoogleMapsAPIWidget extends Modal{
 				}
 			};
 			this.mainService.serverRequest ( requestCheck , ( args ) => {
-				resolve( "deleted" );
+				resolve("deleted");
 			});
-		}); */
+		}); 
 		
 	}
 	
@@ -109,49 +97,54 @@ export class GoogleMapsAPIWidget extends Modal{
 		this.bindChildObject(this,this.elem);
 	}
 	
-	newLocation ( ...args ){
-		//console.log(args);
+	newLocation (...args) {
+		let context = this ? this : args[0];
+		if (!this) {
+			let locationDetails = args[1]['ARG'];
+			locationDetails['myLocation'] = {
+				lat : parseFloat(locationDetails.LAT),
+				lng : parseFloat(locationDetails.LNG),
+			}
+			context.gmap.relocate(false, locationDetails);
+		}	
+		let locationObject = args.length == 1 ? {
+			close : "onCloseAddLoc",
+			save : "onSaveLoc",
+			MKID : args[0].id,
+			LOC_ID : args[0]['LOC_ID'] ? false : args[0]['LOC_ID'],
+			POS : {
+				LAT : args[0].gm ? args[0].gm.latLng.lat() : 0,
+				LNG : args[0].gm ? args[0].gm.latLng.lng() : 0,
+			}
+		} : {
+			close : "onCloseAddLoc",
+			save : "onSaveLoc",
+			args : args[1]['ARG'],
+		}
+
 		let nl = new NewLocationModalController({
 			modalID :  "new-location-modal",
 			controllerName : "NewLocationModalController",
 			template : "/dis/sources/templates/modal/new.location.modal.template.html",
-			parent : this,
-			args : {
-				close : "onCloseAddLoc",
-				save : "onSaveLoc",
-				MKID : args[0].id,
-				LOC_ID : args[0]['LOC_ID'] ? false : args[0]['LOC_ID'],
-				POS : {
-					LAT : args[0].gm ? args[0].gm.latLng.lat() : 0,
-					LNG : args[0].gm ? args[0].gm.latLng.lng() : 0,
-				}
-			}
+			parent : context,
+			args : locationObject,
 		});
 		nl.render();
-		//console.log(args);
 	}
 	
-	onSaveLoc ( args ){
+	onSaveLoc (args) {
 		let result = args.detail.query;
 		this.gmap.newLocation(result);
-		console.log(args);
 	}
 	
-	onCloseAddLoc ( ){
+	onCloseAddLoc () {
+		this.gmap.closeInfoWindowMarkers();
 	}
-	
-	
 	
 	onSearchLocation (...args){
-		/* //console.log(args);
-		let details = args[0].detail.query.arguments;
-		this.gmap.relocate ( false , {
-			myLocation : {
-				lat : parseFloat(details.LATITUDE),
-				lng : parseFloat(details.LONGITUDE),
-			},
-			args : details
-		} ); */
+		let details = args[0].detail;
+		this.gmap.closeInfoWindowMarkers();
+		this.gmap.relocate (false, details);
 	}
 	
 	removeMarker( ...args ){
@@ -172,24 +165,23 @@ export class GoogleMapsAPIWidget extends Modal{
 	
 	returnBaseLocation ( ){
 		//this.SearchPlacesBar =  this.modalData.args.DEFAULT_LOCATION;
+		this.gmap.closeInfoWindowMarkers();
 		this.gmap.relocate(true);
-		this.bindChildObject ( this , false );	
+		this.bindChildObject (this, false);	
 	}
 	
-	searchLocation ( ){
-		/* let ssm = new SearchModal ({
-			modalID :  "search-modal",
-			controllerName : "searchmodal",
-			template : "/bps/sources/templates/modal/search.modal.template.html",
+	searchLocation () {
+		this.gmap.closeInfoWindowMarkers();
+		let rsm = new ResidentSearchModal({
+			modalID :  "residentSearchModal",
+			controllerName : "ResidentSearchModal",
+			template : "/dis/sources/templates/modal/residents.search.modal.template.html",
 			params : {
-				type : "location",
-				action : 'link',
-				controller : 'GoogleMapsWidgetAPIController',
-				evt : ':onSearchLocation',
+				onSearchLocation : ':onSearchLocation',
 			},
 			parent : this,
 		});
-		ssm.render(); */
+		rsm.render();
 	}
 	
 	init(){

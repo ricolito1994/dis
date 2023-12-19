@@ -8,7 +8,7 @@ export class ResidentialMapController extends Modal {
 		super ( modalData );
 	}
 	
-	constructs(){
+	constructs() {
 		let gmapsWidget = new GoogleMapsAPIWidget ({
 			parent : this,
 			controllerName : "GoogleMapsWidgetAPIController",
@@ -25,11 +25,9 @@ export class ResidentialMapController extends Modal {
 		gmapsWidget.renderDiv("residential-map-container");
 	}
 	
-	newLocation(){
+	newLocation() {
 	}
 	
-	init(){
-		
+	init() {
 	}
-
 }

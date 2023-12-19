@@ -91,7 +91,7 @@ export class Controller{
 		
 	}
 	
-	binds ( ctrl , div ){
+	binds (ctrl, div){
 		
 		let dv = div ? div : "";
 		this.thisElements = [];
@@ -100,7 +100,6 @@ export class Controller{
 		this.ctrl = ctrl;
 		//console.log(this.controllerName,this.controllerNameDOM);
 		//for ( let ctr = 0 ; ctr < this.controllerNameDOM.length ; ctr ++ ){
-		
 		this.bindRecursive( this.controllerNameDOM.children , ctrl );
 		//}
 		
@@ -204,9 +203,7 @@ export class Controller{
 			let selElemDataset = selectedElement.dataset;
 
 			let match = selectedElement.tagName.match( /(?:^|\W)input|select|textarea|date|hidden(?:$|\W)/gi );
-			
-		
-				
+
 			if ( ( match && match !=='null' ) ){
 				if( typeof selElemDataset.valuectrl != 'undefined' ){
 					let dsets = selElemDataset.valuectrl.split(".");

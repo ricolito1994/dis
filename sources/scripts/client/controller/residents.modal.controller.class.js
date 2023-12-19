@@ -131,6 +131,15 @@ export class ResidentsModalController extends Modal {
 			}
 		}
 
+		if ( this.modalData.args['new_location_modal'] ){ 
+			$('#others_1_container').css('display', 'none');
+			$('#contacts_container').css('display', 'none');
+			$('#res_qrcode_container').css('display', 'none');
+			$('#res_save_btn').css('display', 'none');
+			$('#res_print_card_btn').css('display', 'none');
+			$('#family_leader_container').css('display' ,'none');
+		}
+
 		var qrcode = new QRCode(qrid);
 		qrcode.makeCode(this.residentVars.RESIDENT_ID);
 		this.setComordibity();

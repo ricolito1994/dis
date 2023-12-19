@@ -29,7 +29,7 @@
 					</div>
 					<div style="clear:both"></div>
 				</div>
-				<div style="width:100%;margin-top:2%;">
+				<div id="address_container" style="width:100%;margin-top:2%;">
 					<div style="width:51%;float:left;padding-left:.33%" >
 						ADRESS <br>
 						<input type="text" data-event='ResidentsModalController.change.changeValues' class="form-control" id="ResidentModalAddress" data-event="ResidentsModalController.change.changeValues" data-valuectrl="residentVars.ADDRESS" />
@@ -50,7 +50,7 @@
 					<div style="clear:both"></div>
 				</div>
 
-				<div style="width:100%;margin-top:2%;">
+				<div id="contacts_container" style="width:100%;margin-top:2%;">
 					<div style="width:30%;float:left;padding-left:.33%" >
 						EMERGENCY CONTACT NAME <br>
 						<input type="text" class="form-control" data-event="ResidentsModalController.change.changeValues" data-valuectrl="residentVars.EMERGENCY.NAME" />
@@ -69,7 +69,40 @@
 					<div style="clear:both"></div>
 				</div>
 
-				<div style="width:100%;margin-top:2%;">
+				<div id="family_leader_container" style="width:33%;margin-top:2%;" >
+					IS FAMILY LEADER <br>
+					<select  class="form-control" data-valuectrl="residentVars.IS_FAMILY_LEADER"  data-event="ResidentsModalController.change.changefamilyleaderstat">
+						<option value='1'>YES</option>
+						<option value='0'>NO</option>
+					</select>
+				</div>
+				
+				<div id="fam-leader-container" style="width:33%;margin-top:2%;">
+					FAMILY HEAD<BR>
+					<input class="form-control" type="text" data-valuectrl="hh_leader" disabled />
+						<a href='javascript:void(0)'  data-params='{"onevt":":onSelectBrgyHead","search":"resident_leader"}' data-event="ResidentsModalController.click.searchResident"><i class="icon-search"></i> Search</a>&nbsp;
+						<a style="color:red;"   data-event="ResidentsModalController.click.removeBrgyHead" href='javascript:void(0)'><i class="icon-remove"></i> Remove</a>
+				</div>
+				<div id="fam-members-tbl-container" style="width:100%;margin-top:2%;">
+					FAMILY MEMBERS  <a href="javascript:void(0);" data-event="ResidentsModalController.click.searchResident">+ADD</a><BR>
+					<div>
+						<table class="table" id="members-hh-table">
+							<thead>
+								<tr>
+									<td>Fullname</td>
+									<td>Birthday</td>
+									<td>Age</td>
+									<td>Action</td>
+								</tr>
+							</thead>
+							<tbody>
+								
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<div id="others_1_container" style="width:100%;margin-top:5%;">
 					<div style="width:15%;float:left;padding-right:2%" >
 						BLOOD TYPE <br>
 						<select  class="form-control" data-valuectrl="residentVars.BLOOD_TYPE" >
@@ -143,39 +176,8 @@
 					
 				</div>-->
 
-				<div style="width:33%;margin-top:2%;" >
-					IS FAMILY LEADER <br>
-					<select  class="form-control" data-valuectrl="residentVars.IS_FAMILY_LEADER"  data-event="ResidentsModalController.change.changefamilyleaderstat">
-						<option value='1'>YES</option>
-						<option value='0'>NO</option>
-					</select>
-				</div>
 				
-				<div id="fam-leader-container" style="width:33%;margin-top:2%;">
-					FAMILY HEAD<BR>
-					<input class="form-control" type="text" data-valuectrl="hh_leader" disabled />
-						<a href='javascript:void(0)'  data-params='{"onevt":":onSelectBrgyHead","search":"resident_leader"}' data-event="ResidentsModalController.click.searchResident"><i class="icon-search"></i> Search</a>&nbsp;
-						<a style="color:red;"   data-event="ResidentsModalController.click.removeBrgyHead" href='javascript:void(0)'><i class="icon-remove"></i> Remove</a>
-				</div>
-				<div id="fam-members-tbl-container" style="width:100%;margin-top:2%;">
-					FAMILY MEMBERS  <a href="javascript:void(0);" data-event="ResidentsModalController.click.searchResident">+ADD</a><BR>
-					<div>
-						<table class="table" id="members-hh-table">
-							<thead>
-								<tr>
-									<td>Fullname</td>
-									<td>Birthday</td>
-									<td>Age</td>
-									<td>Action</td>
-								</tr>
-							</thead>
-							<tbody>
-								
-							</tbody>
-						</table>
-					</div>
-				</div>
-				<div style="width:33%;margin-top:5%;" >
+				<div id="res_qrcode_container" style="width:33%;margin-top:5%;" >
 					<b>QRCODE</b><BR>
 					<div  id="qrcode" style="width:110%;">
 				
@@ -190,9 +192,12 @@
 		  </div>
 		  <!-- Modal footer -->
 		  <div class="modal-footer">
-			<button data-event="ResidentsModalController.click.save" class="btn btn-primary"><i class="icon-arrow-down" ></i> SAVE</button>
-			<button data-event="ResidentsModalController.click.printHealthCard" class="btn btn-primary"><i class="icon-print" ></i> PRINT HEALTH CARD</button>
-		 
+			<button id="res_save_btn" data-event="ResidentsModalController.click.save" class="btn btn-primary">
+				<i class="icon-arrow-down" ></i> SAVE
+			</button>
+			<button id="res_print_card_btn" data-event="ResidentsModalController.click.printHealthCard" class="btn btn-primary">
+				<i class="icon-print" ></i> PRINT HEALTH CARD
+			</button>	 
 		  </div>
 		</div>
 	</div>
