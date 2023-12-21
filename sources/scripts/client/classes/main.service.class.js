@@ -1111,4 +1111,145 @@ export class MainService {
 			});	
 		});
 	}
+
+	getBenifitTypes () {
+		let dataQuery = {
+			type: "POST",
+			url : this.urls["generic"].url,
+			data : {
+				data : {
+					request : 'generic',
+					REQUEST_QUERY : [
+						{
+							sql : `SELECT * FROM dis.benifit_claim_types w where ?`,
+							db : 'DB',
+							query_request : 'GET',
+							index : 'result',
+							values : [1],
+						},	
+					]
+				}		
+			}
+		};
+		return new Promise ( (resolve, reject) => {
+			this.serverRequest( dataQuery , ( res ) => {
+				setTimeout( ( ) => {
+					resolve((JSON.parse(res))['result']);
+				},110);
+			} 
+			, ( res ) => {
+				//err
+				reject(res);
+			});	
+		});
+	}
+
+	viewClaimRecordsFamilyMembers (params) {
+		let _this = !params.MAIN_SERVICE_CONTEXT ? this : params.MAIN_SERVICE_CONTEXT;
+		let residentId = params.RESIDENT_ID;
+		let dateFrom = params.DATE_FROM;
+		let dateTo = params.DATE_TO;
+		let dataQuery = {
+			type: "POST",
+			url : _this.urls["generic"].url,
+			data : {
+				data : {
+					request : 'generic',
+					REQUEST_QUERY : [
+						{
+							sql : 
+							`SELECT 
+								brs.FULLNAME, brs.RESIDENT_ID, brs.HH_LEADER, brs.ADDRESS, brs.BIRTHDAY,
+								round(DATEDIFF(CURRENT_DATE,  brs.BIRTHDAY)/365) AS AGE,
+								bcr.*, (
+									SELECT BENIFIT_NAME FROM benifit_claim_types WHERE ID = bcr.CLAIM_TYPE
+								) as BENIFIT_NAME,
+								(
+									SELECT FULLNAME from barangay_res_setup WHERE RESIDENT_ID = brs.HH_LEADER
+								) as HHLEADERFULLNAME 
+								FROM dis.barangay_res_setup brs 
+								INNER JOIN dis.benifit_claim_records bcr
+								ON bcr.RESIDENT_ID = brs.RESIDENT_ID 
+								WHERE 
+								brs.HH_LEADER = ? AND
+								DATE_CLAIM BETWEEN ? AND ?
+								ORDER BY brs.FULLNAME, bcr.CLAIM_TYPE, bcr.DATE_CLAIM`,
+							db : 'DB',
+							query_request : 'GET',
+							index : 'result',
+							values : [
+								residentId,
+								dateFrom,
+								dateTo,
+							],
+						},	
+					]
+				}		
+			}
+		};
+		return new Promise ( (resolve, reject) => {
+			_this.serverRequest( dataQuery , ( res ) => {
+				setTimeout( ( ) => {
+					resolve((JSON.parse(res))['result']);
+				},110);
+			} 
+			, ( res ) => {
+				//err
+				reject(res);
+			});	
+		});
+	}
+
+	getResidentOtherDetails (argss) {
+		let dataQuery = {
+			type: "POST",
+			url : this.urls["generic"].url,
+			data : {
+				data : {
+					request : 'generic',
+					REQUEST_QUERY : [
+						{
+							sql : `select RS.FULLNAME,RS.RESIDENT_ID,RS.BIRTHDAY from dis.barangay_res_setup RS
+									where RS.HH_LEADER = ?`,
+							db : 'DB',
+							index : 'hh_members',
+							query_request : "GET",
+							values : [argss.RESIDENT_ID]
+						},	
+						{
+							sql : `select * from barangay_prk_setup where PRK_ID = ?`,
+							db : 'DB',
+							index : 'prk',
+							query_request : "GET",
+							values : [argss.PUROK]
+						},
+						{
+							sql : `select FULLNAME,HH_LEADER,RESIDENT_ID from barangay_res_setup where RESIDENT_ID = ?`,
+							db : 'DB',
+							index : 'hh_leader',
+							query_request : "GET",
+							values : [argss.HH_LEADER]
+						},
+						
+					]
+				}	
+			}
+			
+		};
+		return new Promise ((resolve, reject) => {
+			this.serverRequest( dataQuery , ( res ) => {
+				setTimeout ( ( ) =>{
+					let hhmems = JSON.parse(res);
+					argss['hh_members'] = hhmems['hh_members'];
+					if ( hhmems['prk'][0] )
+						argss['PUROK_NAME'] = hhmems['prk'][0]['PRK_NAME'];
+					if ( hhmems['hh_leader'][0] )
+						argss['hh_leader'] = hhmems['hh_leader'][0]['FULLNAME'];
+					resolve(argss);	
+				}, 100);
+			}, err => {
+				reject(err);
+			});
+		});
+	}
 }

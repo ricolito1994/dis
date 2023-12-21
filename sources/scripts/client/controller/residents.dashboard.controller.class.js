@@ -1,6 +1,7 @@
 import { Modal } from "../classes/modal.controller.class.js"
 import { DataTableService } from "../classes/datatable.service.class.js";
 import { ServerRequest } from "../classes/serverrequest.service.class.js";
+import { ResidentsModalController } from "./residents.modal.controller.class.js";
 
 export class ResidentsDashboardController extends Modal {
 	
@@ -22,8 +23,8 @@ export class ResidentsDashboardController extends Modal {
 	
 	
 	constructs(){
-		var html5QrcodeScanner = new Html5QrcodeScanner("qrcode", { fps: 10, qrbox: 250 });
-			html5QrcodeScanner.render(this.ScanSuccess.bind(this),this.ScanError.bind(this));
+		var html5QrcodeScanner = new Html5QrcodeScanner("qrcode11", { fps: 10, qrbox: 250 });
+			html5QrcodeScanner.render(this.ScanSuccess.bind(this), this.ScanError.bind(this));
 
 		this.dataTable = new DataTableService({
 			template : "/dis/sources/templates/section/datatable.template.section.html",
@@ -88,17 +89,87 @@ export class ResidentsDashboardController extends Modal {
 						}
 					]
 				},
-					
-					
+
+				{
+					head : "ACTION",
+					elements : [
+						{	
+							createElement : "a",
+							attributes : [
+								{
+									attribute: "href",
+									value : "javascript:void(0);",
+								},
+								{
+									attribute: "className",
+									value : "btn btn-primary",
+								},
+								{
+									type : "event",
+									attribute : "click",
+									value : async (argss) => {
+										let residentOtherDetails = 
+											await this.mainService.getResidentOtherDetails(argss);
+										this.openResidentModal(residentOtherDetails);
+									},
+								}
+							],
+							children : [
+								{
+									createElement : "i",
+									attributes : [
+										{
+											attribute: "className",
+											value : "icon-search",
+										}
+									]
+								}
+							]
+						},
+						{	
+							createElement : "span",
+							attributes:[
+								{
+									attribute:"innerHTML",
+									value : "&nbsp;"
+								}
+							]
+						},
+						{	
+							createElement : "span",
+							attributes:[
+								{
+									attribute:"innerHTML",
+									value : "&nbsp;"
+								}
+							]
+						},
+					]
+				}
 			],
 	
 		});
 		this.initTableScans();
 	}
 
-	initTableScans ( ) {
+	openResidentModal (args) {
+		console.log('args', args)
+		let nl = new ResidentsModalController({
+			modalID :  "residents-modal",
+			controllerName : "ResidentsModalController",
+			template : "/dis/sources/templates/modal/residents.modal.template.html",
+			parent : this,
+			isUpdate : true,
+			args : args,
+			onSearchEvent : `${this.controllerName}:onUpdateResidents`,
+		});
+		nl.render();
+	}
+
+	initTableScans () {
 		let sql = 
 		`SELECT 
+			brs.*,
 			CONCAT(brs.FIRSTNAME,' ',brs.LASTNAME) as NAME, 
 			CONCAT(brss.FIRSTNAME,' ',brss.LASTNAME) as CLERK,
 			brs.ADDRESS,
@@ -165,13 +236,16 @@ export class ResidentsDashboardController extends Modal {
 					REQUEST_QUERY : [
 						{
 							sql : 
-								`SELECT w.RESIDENT_ID,
+								`SELECT w.*,
 								S.ID,
 								S.DATE_SCAN,
 								CONCAT(w.LASTNAME,' ',w.FIRSTNAME) FNAME 
 								FROM dis.barangay_res_setup w 
 								LEFT JOIN scan S ON S.RES_ID = w.RESIDENT_ID 
 								WHERE w.RESIDENT_ID = ?`,
+								/* `SELECT w.*
+								FROM dis.barangay_res_setup w 
+								WHERE w.RESIDENT_ID = ?`, */
 							db : 'DB',
 							query_request : 'GET',
 							index : 'result',
@@ -185,7 +259,10 @@ export class ResidentsDashboardController extends Modal {
 		
 		this.mainService.serverRequest( dataQuery , ( res ) => {
 			let stds = (JSON.parse(res))['result'][0];
+			let $stopCameraButton = document.getElementById("html5-qrcode-button-camera-stop");
+			if ($stopCameraButton) $stopCameraButton.click();
 			if(stds){
+				//this.saveScan(stds);
 				let nextScan = this.mainService.addDays(stds.DATE_SCAN,this.NEXT_SCAN);
 				let daysPassedTilNextScan = this.mainService.calculateDaysPassed (this.mainService.getCurrentDate(), nextScan, true);
 				if (daysPassedTilNextScan.value <= 0) {
@@ -203,21 +280,18 @@ export class ResidentsDashboardController extends Modal {
 	}
 	
 	ScanError(errorText){
+		console.log('errorText', errorText)
 		//alert(`${errorText}`);
 	}
 	
-	saveScan( res ) {
-		this.scanObject.RES_ID = res.RESIDENT_ID;
+	saveScan(resident) {
+		this.scanObject.RES_ID = resident.RESIDENT_ID;
 		this.scanObject.CLERK = session_data.ID;
 
 		this.bindChildObject(this,true);
 		let saveparams = ( ServerRequest.queryBuilder( this.mainService.object2array(this.scanObject) , this.isUpdate ? "UPDATE" : "INSERT" ) );
-		
-		
 		let sql1 = !this.isUpdate ? `INSERT INTO scan ${saveparams.initial} VALUES ${saveparams.seconds}` :
 									`UPDATE scan ${saveparams.initial} where PRK_ID = ""`;
-		
-		
 		let dataQuery = {
 			type: "POST",
 			url : this.mainService.urls["generic"].url,
@@ -240,9 +314,8 @@ export class ResidentsDashboardController extends Modal {
 			
 		};
 
-		console.log(dataQuery)
-		this.mainService.serverRequest( dataQuery , ( res ) => {
-			console.log(res);
+		//console.log(dataQuery)
+		this.mainService.serverRequest(dataQuery , async (res) => {
 			/* MainService.EventObject[this.modalData.parent.controllerName].dispatch (`${this.modalData.onSearchEvent}` , {
 				detail : {
 					query : {
@@ -250,7 +323,11 @@ export class ResidentsDashboardController extends Modal {
 					}
 				} 
 			}); */
-			alert(`Scan Success!`);
+			//alert(`Scan Success!`);
+			//console.log(resident)
+			let residentOtherDetails = 
+				await this.mainService.getResidentOtherDetails(resident);
+				this.openResidentModal(residentOtherDetails);
 			this.initTableScans();
 		} 
 		, ( err ) => {

@@ -1,4 +1,4 @@
-<div class="modal modals-sm"  tabindex="2" id="residents-modal"  data-controller="ResidentsModalController">  
+<div class="modal modals-sm"  tabindex="3" id="residents-modal"  data-controller="ResidentsModalController">  
 	<div class="modal-dialog"  style="min-width: 80%;">
 		<div class="modal-content">
 	      <!-- Modal Header -->
@@ -84,7 +84,10 @@
 						<a style="color:red;"   data-event="ResidentsModalController.click.removeBrgyHead" href='javascript:void(0)'><i class="icon-remove"></i> Remove</a>
 				</div>
 				<div id="fam-members-tbl-container" style="width:100%;margin-top:2%;">
-					FAMILY MEMBERS  <a href="javascript:void(0);" data-event="ResidentsModalController.click.searchResident">+ADD</a><BR>
+					FAMILY MEMBERS  
+						<a href="javascript:void(0);" data-event="ResidentsModalController.click.searchResident">+ADD</a>
+						<a href="javascript:void(0);" data-event="ResidentsModalController.click.viewClaimRecordsFamilyMembers">+VIEW CLAIM RECORDS</a>
+					<BR>
 					<div>
 						<table class="table" id="members-hh-table">
 							<thead>
@@ -173,10 +176,7 @@
 							<option value='1'>YES</option>
 						</select>
 					</div>
-					
 				</div>-->
-
-				
 				<div id="res_qrcode_container" style="width:33%;margin-top:5%;" >
 					<b>QRCODE</b><BR>
 					<div  id="qrcode" style="width:110%;">
@@ -194,6 +194,9 @@
 		  <div class="modal-footer">
 			<button id="res_save_btn" data-event="ResidentsModalController.click.save" class="btn btn-primary">
 				<i class="icon-arrow-down" ></i> SAVE
+			</button>
+			<button id="res_claim_records" data-event="ResidentsModalController.click.claimBenifitRecords" class="btn btn-primary">
+				<i class="icon-arrow-down" ></i> CLAIM RECORDS
 			</button>
 			<button id="res_print_card_btn" data-event="ResidentsModalController.click.printHealthCard" class="btn btn-primary">
 				<i class="icon-print" ></i> PRINT HEALTH CARD

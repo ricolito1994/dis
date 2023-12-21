@@ -4,15 +4,15 @@ import { ServerRequest } from "../classes/serverrequest.service.class.js";
 import { LoadingModal } from "./loading.modal.controller.class.js";
 import { SearchModal } from "./search.modal.controller.class.js";
 import { MainService } from "../classes/main.service.class.js";
+import { DateRangeModal } from "./date.range.modal.controller.js";
+import { ResidentBenifitClaimRecordsModalController } from "./residents.benifit.claim.records.modal.controller.class.js";
 
 export class ResidentsModalController extends Modal {
-	
 	constructor ( modalData ){
 		super ( modalData );
 		this.brgyname = session_data.BARANGAY_NAME;
 		this.tenYearsAgo = this.mainService.minusDays(this.mainService.getCurrentDate(),3650)
 		this.isUpdate = this.modalData.isUpdate;	
-		//console.log(this.modalData)
 		this.residentVars = {
 			FIRSTNAME : "",
 			LASTNAME : "",
@@ -138,6 +138,11 @@ export class ResidentsModalController extends Modal {
 			$('#res_save_btn').css('display', 'none');
 			$('#res_print_card_btn').css('display', 'none');
 			$('#family_leader_container').css('display' ,'none');
+			$('#res_claim_records').css('display', 'none');
+		}
+
+		if (!this.isUpdate) {
+			$('#res_claim_records').css('display', 'none');
 		}
 
 		var qrcode = new QRCode(qrid);
@@ -375,6 +380,39 @@ export class ResidentsModalController extends Modal {
 			this.bindChildObject ( this , false );
 		//},1000);
 	}
+
+	async viewClaimRecordsFamilyMembers () {
+		//let claimRecordsFamilyMembers = 
+		//	await this.mainService.viewClaimRecordsFamilyMembers(this.residentVars.RESIDENT_ID);
+		let ssm = new DateRangeModal ({
+			modalID :  "dateRangeModal",
+			controllerName : "DateRangeModal",
+			template : "/dis/sources/templates/modal/date.range.modal.template.html",
+			params : {
+				asyncRequest: this.mainService.viewClaimRecordsFamilyMembers,
+				next: this.openMembersClaimsReport,
+				paramsMethod : {
+					RESIDENT_ID : this.residentVars.RESIDENT_ID,
+					MAIN_SERVICE_CONTEXT : this.mainService,
+				}
+			},
+			parent : this,
+		});
+		ssm.render();
+	}
+
+	openMembersClaimsReport (result, context, params) {
+		let _this = context;
+		console.log(result)
+		_this.mainService.openTab(
+			"POST", 
+			"/dis/sources/templates/reports/residents.benifit.claims.report.template.php", {
+				data : {
+					res : result,
+					param : params
+				},
+			}, "blank_");
+	}
 	
 	viewMember( arg ){
 		
@@ -453,7 +491,6 @@ export class ResidentsModalController extends Modal {
 	onAddMembers( arg ){
 		let mems = arg.detail.query;
 		let index = this.houseHoldMembers.findIndex(x=>x.RESIDENT_ID == mems.RESIDENT_ID);
-		console.log(mems);
 		if ( index > -1 || (mems.HH_LEADER != "" && mems.HH_LEADER != this.residentVars.RESIDENT_ID) ){
 			alert ("Has already added as family member!");
 			return;
@@ -478,7 +515,15 @@ export class ResidentsModalController extends Modal {
 		this.bindChildObject ( this , false );
 	}
 	
-
+	claimBenifitRecords () {
+		let ssm = new ResidentBenifitClaimRecordsModalController ({
+			modalID :  "claim-benifits-modal",
+			controllerName : "ResidentBenifitClaimRecordsModalController",
+			template : "/dis/sources/templates/modal/residents.benifit.claim.records.modal.template.html",
+			parent : this,
+		});
+		ssm.render();
+	}
 	
 	onLinkPurok ( arg ){
 		/* if (this.residentVars.IS_FAMILY_LEADER == 0){
